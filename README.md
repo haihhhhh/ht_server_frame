@@ -29,3 +29,5 @@
 2. 网关在[认证入口](app/authentication.go)完成凭据检查与 Pitaya Session 绑定。客户端业务方法通过 [app.Call](app/endpoint.go) 接入准入和身份检查，再按需调用[远端节点](app/rpc.go)。
 3. 项目决定哪些数据在一个循环内读写。模板已进入角色的普通请求定向到原 game；新增节点可接收尚无归属的对象。节点失联时不会自动接管其内存状态。
 4. 服务通过[推送接口](docs/push-and-groups.md)向客户端发通知，使用[宿主停止流程](docs/architecture/05-lifecycle-failures.md)排空在途工作并关闭依赖。
+
+本项目采用 [MIT 许可证](LICENSE)。
