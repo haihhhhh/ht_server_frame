@@ -1,0 +1,43 @@
+{{.Header}}
+package {{.Package}}
+{{- $context := qual "context" "Context"}}
+{{- $message := qual "github.com/golang/protobuf/proto" "Message"}}
+{{- $errorf := qual "fmt" "Errorf"}}
+// RPCCaller 可直接使用框架 App；不选择节点，也不自动重试。
+type RPCCaller interface {
+	RPCTo({{$context}}, string, string, {{$message}}, {{$message}}) error
+}
+{{- range .Services}}
+{{- if .Forward}}
+{{template "forwarder.go.tmpl" .}}
+{{- end}}
+{{- $name := printf "%sRPC" .GoName}}
+// {{$name}} 仅封装请求、响应和路由；节点由调用方指定。
+type {{$name}} struct {
+	caller RPCCaller
+	serverType string
+}
+func New{{$name}}(caller RPCCaller, serverType string) (*{{$name}}, error) {
+	if caller == nil || serverType == "" {
+		return nil, {{$errorf}}("RPC caller or server type missing")
+	}
+	for _, c := range serverType {
+		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
+			return nil, {{$errorf}}("invalid server type")
+		}
+	}
+	return &{{$name}}{caller: caller, serverType: serverType}, nil
+}
+{{- range .Methods}}
+func (c *{{$name}}) {{.Name}}(ctx {{$context}}, serverID string, request *{{ident .Input}}) (*{{ident .Output}}, error) {
+	if c == nil || c.caller == nil || serverID == "" || request == nil {
+		return nil, {{$errorf}}("RPC target or request missing")
+	}
+	reply := new({{ident .Output}})
+	if err := c.caller.RPCTo(ctx, serverID, c.serverType+{{printf "%q" (printf ".%s" .Route)}}, reply, request); err != nil {
+		return nil, err
+	}
+	return reply, nil
+}
+{{- end}}
+{{- end}}

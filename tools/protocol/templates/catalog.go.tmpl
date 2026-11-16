@@ -1,0 +1,17 @@
+{{.Header}}
+package {{.Package}}
+
+import contracts "github.com/haihhhhh/ht_server_frame/protocol"
+
+// NewProtocolCatalog 创建共同定义生成的消息和接口目录。
+func NewProtocolCatalog() (*contracts.Catalog, error) {
+	return contracts.New(contracts.Definition{Messages: []contracts.Message{
+		{{- range .Definition.Messages}}
+		{ID: {{.ID}}, Name: {{printf "%q" .Name}}},
+		{{- end}}
+	}, Methods: []contracts.Method{
+		{{- range .Definition.Methods}}
+		{Service: {{printf "%q" .Service}}, Name: {{printf "%q" .Name}}, Request: {{printf "%q" .Request}}, Response: {{printf "%q" .Response}}},
+		{{- end}}
+	}})
+}

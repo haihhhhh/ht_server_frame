@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package ht.example.v1;
+
+option go_package = "github.com/haihhhhh/ht_server_frame/examples/protocol/generated;protocol";
+
+// 消息内容示例；是否用于响应或推送由业务决定。
+message Notification {
+  string text = 1;
+}

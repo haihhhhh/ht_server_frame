@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ht.example.v1;
+option go_package = "github.com/haihhhhh/ht_server_frame/examples/protocol/generated;protocol";
+import "hello.proto";
+import "notification.proto";
+
+// 目录只描述编号，不作为网络包装；编号为组字段号乘 256 加组内字段号。
+message Messages {
+  BasicMessages basic = 1;
+}
+
+message BasicMessages {
+  HelloRequest hello_request = 1;
+  HelloResponse hello_response = 2;
+  Notification notification = 3;
+}

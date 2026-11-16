@@ -1,0 +1,28 @@
+{{- $context := qual "context" "Context"}}
+{{- $message := qual "github.com/golang/protobuf/proto" "Message"}}
+{{- $name := printf "%sForwarder" .GoName}}
+// {{$name}} 把该服务的客户端请求交给统一转发函数；节点选择由项目负责。
+// 【生成代码，通常无需修改】入口统一检查登录身份，再调用项目的 ForwardRequest；增加接口请修改协议源并重新生成。
+type {{$name}} struct {
+	{{qual "github.com/topfreegames/pitaya/v2/component" "Base"}}
+	Application *{{qual "github.com/haihhhhh/ht_server_frame/app" "App"}}
+	ForwardRequest func({{$context}}, string, {{$message}}, {{$message}}) error
+}
+func New{{.GoName}}ForwardRequest(route string) {{$message}} {
+	switch route {
+	{{- range .Methods}}
+	case {{printf "%q" .Route}}:
+		return new({{ident .Input}})
+	{{- end}}
+	}
+	return nil
+}
+{{- range .Methods}}
+func (handler *{{$name}}) {{.Name}}(ctx {{$context}}, request *{{ident .Input}}) (*{{ident .Output}}, error) {
+	return {{qual "github.com/haihhhhh/ht_server_frame/app" "Call"}}(ctx, handler.Application, {{printf "%q" .Route}}, true, request, func(ctx {{$context}}, request *{{ident .Input}}) (*{{ident .Output}}, error) {
+		response := new({{ident .Output}})
+		err := handler.ForwardRequest(ctx, {{printf "%q" .Route}}, request, response)
+		return response, err
+	})
+}
+{{- end -}}

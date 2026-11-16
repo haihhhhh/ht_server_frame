@@ -1,0 +1,3 @@
+*.sh text eol=lf
+*.bat text eol=crlf
+/examples/server/data/tables/*.json text eol=lf

@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ht.example.v1;
+
+option go_package = "github.com/haihhhhh/ht_server_frame/examples/protocol/generated;protocol";
+
+// 问候请求；用户名仅作为显示文本，不作为登录身份。
+message HelloRequest {
+  string name = 1;
+}
+
+// 问候响应，与请求使用不同的类型。
+message HelloResponse {
+  string greeting = 1;
+}
+
+// 只声明配对和接口名称，运行时仍使用 Pitaya，不生成 gRPC 服务。
+service Greeting {
+  rpc Hello(HelloRequest) returns (HelloResponse);
+}

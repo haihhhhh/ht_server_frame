@@ -1,0 +1,6 @@
+/bin/
+/.cache/
+/.tools/
+*.test
+coverage.out
+/examples/protocol/generated/
